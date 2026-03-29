@@ -4,7 +4,7 @@ services:
   backend:
  #   build:
 #      context: .
-    image: rahulyadav1206/my-jenkins-test-app:v1
+    image: rahulyadav1206/my-jenkins-test-app:v2
     ports:
       - "5000:5000"
     environment:
