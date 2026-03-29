@@ -1,7 +1,7 @@
 pipeline {
     agent any 
     stages {
-        stage ("code") {
+        stage ("code clon") {
             steps {
                 git url : "https://github.com/Rahul10052023/two-tier-flask-app.git", branch : "master"   
                 echo " Code clone Successfully"
