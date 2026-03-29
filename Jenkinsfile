@@ -1,30 +1,53 @@
 pipeline {
-    agent any
-    
-    stages{
-        stage("Code"){
-            steps{
-                git url: "https://github.com/LondheShubham153/two-tier-flask-app.git", branch: "jenkins"
+    agent any 
+    stages {
+        stage ("code") {
+            steps {
+                git url : "https://github.com/Rahul10052023/two-tier-flask-app.git", branch : "master"   
+                echo " Code clone Successfully"
             }
         }
-        stage("Build & Test"){
-            steps{
-                sh "docker build . -t flaskapp"
+        stage ("build and push in docker hub") {
+            steps {
+                withCredentials([ usernamePassword(
+                    credentialsId:"dockerhubcred",
+                    passwordVariable:"dockerhubPass",
+                    usernameVariable:"dockerhubUser"
+                )] ){
+                sh " docker build -t my-jenkins-test-app ."
+                sh " docker login -u ${env.dockerhubUser} -p ${env.dockerhubPass} "
+                sh " docker tag my-jenkins-test-app ${env.dockerhubUser}/my-jenkins-test-app:v2"
+                sh "docker push ${env.dockerhubUser}/my-jenkins-test-app:v2"
             }
-        }
-        stage("Push to DockerHub"){
-            steps{
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker tag flaskapp ${env.dockerHubUser}/flaskapp:latest"
-                    sh "docker push ${env.dockerHubUser}/flaskapp:latest" 
-                }
-            }
-        }
-        stage("Deploy"){
-            steps{
-                sh "docker-compose down && docker-compose up -d"
-            }
-        }
+         }
     }
+        stage (" Docker compose up ") {
+            steps {
+                sh " docker compose up -d "
+            }
+        }
+        
+        stage ("test") {
+            steps {
+                echo "This is test stage"
+                
+            }
+        }
+        stage ("deploy") {
+            steps {
+                echo "This is deploy stage"
+            }
+            
+        }
+        stage("debug") {
+            steps {
+                sh 'pwd'
+                sh 'ls -l'
+                
+            }
+            }
+        
+    }
+    
 }
+            
